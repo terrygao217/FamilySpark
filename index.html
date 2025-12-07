@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>亲心学园 - FamilySpark</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* -------------------- 基础与变量 -------------------- */
+        :root {
+            --primary-color: #4CAF50; /* 清新绿色 */
+            --secondary-color: #FFC107; /* 活泼黄色 */
+            --text-color: #333;
+            --light-gray: #f4f7f6;
+            --card-bg: #fff;
+            --danger-color: #f44336;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            padding: 10px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* -------------------- 页面容器 -------------------- */
+        .page {
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* -------------------- 通用组件 -------------------- */
+        input[type="text"], input[type="number"], input[type="password"], textarea, select, button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+        }
+
+        button:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .danger {
+            background-color: var(--danger-color);
+        }
+        .danger:hover {
+            background-color: #d32f2f;
+        }
+
+        .card {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 5px solid var(--secondary-color);
+        }
+
+        /* -------------------- 启动页样式 -------------------- */
+        #auth-page h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .identity-selection {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .identity-selection label {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 8px;
+            border: 2px solid var(--primary-color);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .identity-selection input[type="radio"] {
+            display: none;
+        }
+
+        .identity-selection input[type="radio"]:checked + label {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .remember-me {
+            display: block;
+            margin-top: -5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* -------------------- 主应用 header 和导航 -------------------- */
+        header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        #current-user-display {
+            font-size: 1.2em;
+            color: var(--primary-color);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        #current-user-display i {
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        nav button {
+            width: auto;
+            padding: 8px 12px;
+            background-color: transparent;
+            color: var(--text-color);
+            border: 1px solid #ddd;
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+
+        nav button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* 设置菜单 */
+        #settings-menu {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        #settings-menu button {
+            width: auto;
+            flex-grow: 1;
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+
+        /* -------------------- 任务模块样式 -------------------- */
+        #tasks-module h4 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #00796b;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 5px;
+        }
+
+        #current-points {
+            font-size: 1.8em;
+            color: #e67e22;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .task-item, .reward-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--card-bg);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .task-info span:first-child {
+            font-weight: bold;
+        }
+        .task-info span {
+            display: block;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .task-item button, .reward-item button {
+            width: auto;
+            padding: 8px 15px;
+            margin-left: 10px;
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+
+        /* 任务筛选 */
+        #task-filter {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        #task-filter button {
+            flex-grow: 1;
+            background-color: #ccc;
+            color: var(--text-color);
+        }
+        #task-filter button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* 徽章 */
+        #achievement-badges {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .badge {
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #fef0cd;
+            border: 1px solid var(--secondary-color);
+            font-size: 0.9em;
+            color: #8a6d3b;
+        }
+
+        /* -------------------- 留言模块样式 -------------------- */
+        .message-area {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .message-area h4 {
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .message-item {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border-left: 4px solid var(--primary-color);
+            position: relative;
+        }
+        .message-item.private {
+            border-left: 4px solid #9c27b0; /* 紫色表示私密 */
+            background-color: #f3e5f5;
+        }
+
+        .message-meta {
+            font-size: 0.8em;
+            color: #999;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .message-content {
+            font-size: 1.1em;
+            word-wrap: break-word;
+        }
+        .message-delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: none;
+            border: none;
+            color: var(--danger-color);
+            cursor: pointer;
+            width: auto;
+            padding: 0;
+            margin: 0;
+            font-size: 1em;
+        }
+
+        /* 留言发布区 */
+        #post-message-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        #message-input {
+            flex-grow: 1;
+            min-height: 80px;
+            resize: vertical;
+        }
+        #message-type, #post-message-btn, #message-emoji {
+            width: 100%;
+        }
+
+        @media (min-width: 600px) {
+            #message-type, #post-message-btn, #message-emoji {
+                width: auto;
+            }
+            #message-type {
+                width: 150px;
+            }
+            #message-emoji {
+                width: 120px;
+            }
+            #post-message-btn {
+                width: 120px;
+            }
+        }
+
+
+        /* -------------------- 弹窗 (Modal) -------------------- */
+        .modal {
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 15% auto;
+            padding: 25px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 10px;
+            position: relative;
+            animation: fadeIn 0.3s;
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+
+        /* -------------------- 响应式调整 (PC端) -------------------- */
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            header {
+                flex-wrap: nowrap;
+            }
+
+            #current-user-display {
+                margin-bottom: 0;
+            }
+
+            nav button {
+                font-size: 14px;
+            }
+
+            #post-message-area {
+                flex-wrap: nowrap;
+            }
+        }
+    </style>
+
+</head>
+<body>
+
+    <div id="auth-page" class="page">
+        <h2>🎉 欢迎来到亲心学园！</h2>
+        <p>请选择您的身份并设置专属昵称</p>
+        <div class="identity-selection">
+            <label><input type="radio" name="identity" value="student" checked> <i class="fas fa-child"></i> 学生</label>
+            <label><input type="radio" name="identity" value="parent"> <i class="fas fa-user-tie"></i> 家长</label>
+        </div>
+        <input type="text" id="nickname-input" placeholder="输入您的专属昵称 (如: 数学小能手)">
+        
+        <div id="local-password-area">
+            <input type="password" id="local-password" placeholder="可选: 设置/输入本地访问密码 (仅本地留存)">
+        </div>
+
+        <label class="remember-me">
+            <input type="checkbox" id="remember-me" checked> 记住身份与昵称
+        </label>
+        <button id="start-app-btn">🚀 进入空间</button>
+    </div>
+
+    <div id="main-app" class="page hidden">
+        <header>
+            <span id="current-user-display"></span>
+            <nav>
+                <button id="nav-tasks" class="active"><i class="fas fa-check-circle"></i> 打卡奖励</button>
+                <button id="nav-messages"><i class="fas fa-comments"></i> 双向留言</button>
+                <button id="nav-leaderboard"><i class="fas fa-trophy"></i> 排行榜</button>
+                <button id="nav-settings" class="settings-btn"><i class="fas fa-cog"></i> 设置</button>
+            </nav>
+        </header>
+
+        <div id="settings-menu" class="hidden">
+            <button id="change-nickname-btn">修改昵称</button>
+            <button id="switch-identity-btn">切换身份</button>
+            <button id="clear-data-btn" class="danger">清除本地记忆</button>
+        </div>
+
+        <div id="content-container">
+            </div>
+
+        <div id="tips-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-btn tips-close-btn">&times;</span>
+                <h3>💡 学习小Tips!</h3>
+                <p id="tip-content"></p>
+            </div>
+        </div>
+        
+        <div id="task-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-btn task-close-btn">&times;</span>
+                <h4>📝 创建/编辑学习任务</h4>
+                <input type="hidden" id="task-id">
+                <input type="text" id="task-name" placeholder="任务名称 (如: 整理书桌 / 数学压轴题)">
+                <select id="task-category">
+                    <option value="study">学科学习</option>
+                    <option value="chore">家务劳动</option>
+                </select>
+                <input type="number" id="task-points" min="1" value="10" placeholder="任务积分">
+                <button id="save-task-btn">保存任务</button>
+            </div>
+        </div>
+        
+        <div id="reward-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-btn reward-close-btn">&times;</span>
+                <h4>🎁 设置兑换奖励</h4>
+                <input type="hidden" id="reward-id">
+                <input type="text" id="reward-name" placeholder="奖励名称 (如: 课外书 / 周末出游)">
+                <input type="number" id="reward-cost" min="1" value="30" placeholder="所需积分">
+                <button id="save-reward-btn">保存奖励</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局常量和状态
+        let currentUser = {
+            identity: null, // 'student' 或 'parent'
+            nickname: null,
+            remember: false,
+            password: null // Base64编码的本地密码
+        };
+
+        const LS_PREFIX = 'pcl_';
+
+        // 模块数据结构（使用对象确保数据完整性）
+        let appData = {
+            tasks: [],        // 任务列表
+            rewards: [],      // 奖励列表
+            points: 0,        // 当前积分
+            taskRecords: [],  // 打卡记录: [{ date: '2025-12-07', nickname: 'xxx', taskName: 'yyy' }, ...]
+            messages: [],     // 留言列表
+        };
+
+        // 学习Tips数据
+        const TIPS = [
+            "【数学】遇到函数压轴题，先尝试求导找极值点，关注定义域的边界情况。",
+            "【英语】每天背诵10个不熟悉的高频词汇，结合例句记忆效果更佳。",
+            "【家务】整理房间时，遵循 '丢弃-分类-归位' 三步法，效率翻倍！",
+            "【学习】学习新知识后，尝试向别人讲解，这是最好的检验方法。",
+            "【健康】每学习45分钟，站起来活动5分钟，保护视力和颈椎。",
+            "【心态】遇到难题不要慌，试着把它分解成几个小步骤解决。"
+        ];
+
+        // --- I. 核心初始化与身份/昵称模块 ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 绑定导航事件
+            document.getElementById('nav-tasks').addEventListener('click', () => loadModule('tasks'));
+            document.getElementById('nav-messages').addEventListener('click', () => loadModule('messages'));
+            document.getElementById('nav-leaderboard').addEventListener('click', () => loadModule('leaderboard'));
+
+            // 绑定设置菜单事件
+            document.getElementById('nav-settings').addEventListener('click', toggleSettingsMenu);
+            document.getElementById('change-nickname-btn').addEventListener('click', promptChangeNickname);
+            document.getElementById('switch-identity-btn').addEventListener('click', switchToAuthPage);
+            document.getElementById('clear-data-btn').addEventListener('click', clearLocalData);
+            
+            // 绑定启动页事件
+            document.getElementById('start-app-btn').addEventListener('click', handleStartApp);
+            
+            // 关闭Tips弹窗
+            document.querySelector('.tips-close-btn').onclick = () => document.getElementById('tips-modal').classList.add('hidden');
+
+            loadAppData(); // 尝试加载所有本地数据
+            loadUser();    // 检查用户身份并进入应用
+        });
+
+        /** 加载所有本地数据 */
+        function loadAppData() {
+            const dataKeys = ['tasks', 'rewards', 'points', 'taskRecords', 'messages'];
+            dataKeys.forEach(key => {
+                const stored = localStorage.getItem(LS_PREFIX + key);
+                if (stored) {
+                    try {
+                        if (key === 'points') {
+                            appData[key] = parseInt(stored) || 0;
+                        } else {
+                            appData[key] = JSON.parse(stored);
+                        }
+                    } catch (e) {
+                        console.error(`Error parsing ${key} data:`, e);
+                        // 恢复默认空数组/0
+                        if (key === 'points') appData[key] = 0; else appData[key] = [];
+                    }
+                }
+            });
+        }
+
+        /** 保存指定模块数据 */
+        function saveAppData(key) {
+            if (key === 'points') {
+                localStorage.setItem(LS_PREFIX + key, appData[key]);
+            } else {
+                localStorage.setItem(LS_PREFIX + key, JSON.stringify(appData[key]));
+            }
+        }
+
+        /** 检查并加载用户身份 */
+        function loadUser() {
+            const storedIdentity = localStorage.getItem(LS_PREFIX + 'identity');
+            const storedNickname = localStorage.getItem(LS_PREFIX + 'nickname');
+            const storedRemember = localStorage.getItem(LS_PREFIX + 'remember') === 'true';
+            const storedPassword = localStorage.getItem(LS_PREFIX + 'password');
+
+            if (storedRemember && storedIdentity && storedNickname) {
+                currentUser.identity = storedIdentity;
+                currentUser.nickname = storedNickname;
+                currentUser.remember = storedRemember;
+                currentUser.password = storedPassword;
+                
+                if (currentUser.password) {
+                    promptPasswordVerification(showMainApp, showAuthPage);
+                } else {
+                    showMainApp();
+                }
+            } else {
+                showAuthPage();
+            }
+        }
+
+        /** 处理启动按钮点击 */
+        function handleStartApp() {
+            const identity = document.querySelector('input[name="identity"]:checked').value;
+            const nickname = document.getElementById('nickname-input').value.trim();
+            const remember = document.getElementById('remember-me').checked;
+            const password = document.getElementById('local-password').value.trim();
+
+            if (!nickname) {
+                alert('请输入您的专属昵称！');
+                return;
+            }
+
+            currentUser.identity = identity;
+            currentUser.nickname = nickname;
+            currentUser.remember = remember;
+            
+            if (password) {
+                // 简单Base64编码存储，用于本地密码加固
+                currentUser.password = btoa(password);
+            } else {
+                currentUser.password = null;
+            }
+
+            if (remember) {
+                saveUser();
+            }
+            
+            showMainApp();
+        }
+
+        /** 持久化用户身份信息 */
+        function saveUser() {
+            localStorage.setItem(LS_PREFIX + 'identity', currentUser.identity);
+            localStorage.setItem(LS_PREFIX + 'nickname', currentUser.nickname);
+            localStorage.setItem(LS_PREFIX + 'remember', currentUser.remember);
+            if (currentUser.password) {
+                localStorage.setItem(LS_PREFIX + 'password', currentUser.password);
+            } else {
+                localStorage.removeItem(LS_PREFIX + 'password');
+            }
+        }
+
+        /** 显示启动页 */
+        function showAuthPage() {
+            document.getElementById('auth-page').classList.remove('hidden');
+            document.getElementById('main-app').classList.add('hidden');
+            // 清空密码输入框
+            document.getElementById('local-password').value = ''; 
+            document.getElementById('nickname-input').value = currentUser.nickname || '';
+        }
+
+        /** 显示主应用界面 */
+        function showMainApp() {
+            document.getElementById('auth-page').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            
+            document.getElementById('current-user-display').innerHTML = 
+                `<i class="fas fa-user-circle"></i> **${currentUser.nickname}** (${currentUser.identity === 'parent' ? '家长' : '学生'})`;
+            
+            loadModule('tasks'); // 默认加载任务模块
+            showRandomTip();
+        }
+
+        // --- II. 设置与权限功能 ---
+
+        function toggleSettingsMenu() {
+            document.getElementById('settings-menu').classList.toggle('hidden');
+        }
+
+        function promptChangeNickname() {
+            toggleSettingsMenu();
+            const newNickname = prompt(`请输入新的昵称 (当前: ${currentUser.nickname}):`);
+            if (newNickname && newNickname.trim()) {
+                currentUser.nickname = newNickname.trim();
+                if (currentUser.remember) {
+                    saveUser();
+                }
+                showMainApp(); // 刷新显示
+                alert('昵称修改成功！');
+            } else if (newNickname !== null) {
+                alert('昵称不能为空！');
+            }
+        }
+
+        function switchToAuthPage() {
+            if (confirm('确定要切换身份吗？')) {
+                showAuthPage();
+            }
+        }
+
+        function clearLocalData() {
+            if (confirm('警告：确定要清除所有本地存储的身份、昵称、任务和留言数据吗？此操作不可逆！')) {
+                // 仅清除本应用相关的数据
+                Object.keys(localStorage).filter(key => key.startsWith(LS_PREFIX)).forEach(key => {
+                    localStorage.removeItem(key);
+                });
+                alert('所有本地数据已清除。请重新设置身份和昵称。');
+                window.location.reload(); 
+            }
+        }
+
+        /** 密码验证逻辑 */
+        function promptPasswordVerification(onSuccess, onFailure) {
+            let attempts = 3;
+            while (attempts > 0) {
+                const inputPassword = prompt(`请输入本地密码 (${attempts}次机会):`);
+                if (inputPassword === null) {
+                    return onFailure(); // 用户取消
+                }
+                
+                if (btoa(inputPassword) === currentUser.password) {
+                    return onSuccess();
+                }
+                
+                attempts--;
+                alert(`密码错误！您还有 ${attempts} 次机会。`);
+            }
+
+            alert('密码错误次数过多，请重新选择身份或清除本地数据。');
+            onFailure();
+        }
+
+        // --- III. 路由/模块切换 ---
+
+        function loadModule(moduleName) {
+            // 移除所有导航按钮的 active 状态
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+
+            const container = document.getElementById('content-container');
+            
+            if (moduleName === 'tasks') {
+                document.getElementById('nav-tasks').classList.add('active');
+                container.innerHTML = `
+                    <div id="tasks-module">
+                        <h3>🏆 打卡奖励与成就</h3>
+                        <div class="card">
+                            您的当前积分：<span id="current-points">${appData.points}</span>
+                            <button id="exchange-points-btn" ${currentUser.identity === 'parent' ? 'style="display:none"' : ''}>兑换奖励</button>
+                        </div>
+                        
+                        <div id="parent-task-controls" ${currentUser.identity === 'student' ? 'style="display:none"' : ''}>
+                            <button id="create-task-btn"><i class="fas fa-plus-circle"></i> 创建新任务</button>
+                            <button id="manage-rewards-btn"><i class="fas fa-gift"></i> 管理兑换奖励</button>
+                        </div>
+
+                        <h4>任务列表 <i class="fas fa-clipboard-list"></i></h4>
+                        <div id="task-filter">
+                            <button id="filter-all" class="active">全部</button>
+                            <button id="filter-study">学科</button>
+                            <button id="filter-chore">家务</button>
+                        </div>
+                        <div id="task-list"></div>
+
+                        <h4>兑换奖励列表 <i class="fas fa-gift"></i></h4>
+                        <div id="rewards-list"></div>
+
+                        <h4>打卡记录与成就 <i class="fas fa-calendar-check"></i></h4>
+                        <div id="achievement-badges"></div>
+                        <div id="task-records-display"></div>
+                    </div>
+                `;
+                initTaskModule();
+            } else if (moduleName === 'messages') {
+                document.getElementById('nav-messages').classList.add('active');
+                container.innerHTML = `
+                    <div id="messages-module">
+                        <h3>💬 亲子双向留言墙</h3>
+                        <div id="parent-reminder-area" class="message-area"><h4>家长提醒区</h4><div id="reminder-list"></div></div>
+                        <div id="student-feedback-area" class="message-area"><h4>孩子反馈区</h4><div id="feedback-list"></div></div>
+                        <div id="private-wall-area" class="message-area">
+                            <h4>🔒 亲子私密留言墙</h4>
+                            <button id="view-private-btn">查看私密留言 (需验证)</button>
+                            <div id="private-list"></div>
+                        </div>
+                        
+                        <div class="card">
+                            <h4>📝 发布留言</h4>
+                            <div id="post-message-area">
+                                <textarea id="message-input" placeholder="输入您的留言内容..."></textarea>
+                                <select id="message-type">
+                                    <option value="reminder" ${currentUser.identity === 'student' ? 'disabled' : ''} ${currentUser.identity === 'parent' ? 'selected' : ''}>家长提醒</option>
+                                    <option value="feedback" ${currentUser.identity === 'parent' ? 'disabled' : ''} ${currentUser.identity === 'student' ? 'selected' : ''}>孩子反馈</option>
+                                    <option value="private">亲子私密</option>
+                                </select>
+                                <select id="message-emoji">
+                                    <option value="">选择表情</option>
+                                    <option value="😊">😊 快乐</option>
+                                    <option value="💪">💪 努力</option>
+                                    <option value="💡">💡 想法</option>
+                                    <option value="😰">😰 压力</option>
+                                    <option value="❓">❓ 疑问</option>
+                                </select>
+                                <button id="post-message-btn">发布</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                initMessageModule();
+            } else if (moduleName === 'leaderboard') {
+                document.getElementById('nav-leaderboard').classList.add('active');
+                container.innerHTML = `
+                    <div id="leaderboard-module">
+                        <h3>🏅 月度打卡积分排行榜</h3>
+                        <p>排行榜基于所有用户的本地打卡记录计算得出。</p>
+                        <div id="leaderboard-display"></div>
+                    </div>
+                `;
+                displayLeaderboard();
+            }
+        }
+
+        /** 随机学习Tips弹窗 */
+        function showRandomTip() {
+            const tipsModal = document.getElementById('tips-modal');
+            const tipContent = document.getElementById('tip-content');
+            
+            // 每隔一段时间弹出 (例如 15秒后)
+            setTimeout(() => {
+                // 确保 modal 仍可见（用户可能已经操作离开）
+                if (document.getElementById('main-app').classList.contains('hidden')) return;
+
+                const randomTip = TIPS[Math.floor(Math.random() * TIPS.length)];
+                tipContent.textContent = randomTip;
+                tipsModal.classList.remove('hidden');
+            }, 15000);
+        }
+
+
+        // --- IV. 打卡奖励模块 (Task Logic) ---
+
+        let currentFilter = 'all';
+
+        function initTaskModule() {
+            displayTasks();
+            displayRewards();
+            displayBadges();
+            displayTaskRecords();
+
+            // 绑定按钮
+            if (currentUser.identity === 'parent') {
+                document.getElementById('create-task-btn').addEventListener('click', () => openTaskModal());
+                document.getElementById('manage-rewards-btn').addEventListener('click', () => openRewardModal());
+            } else {
+                // 学生点击兑换奖励按钮时，只是刷新奖励列表
+                document.getElementById('exchange-points-btn').addEventListener('click', displayRewards);
+            }
+            document.getElementById('save-task-btn').addEventListener('click', saveTask);
+            document.getElementById('save-reward-btn').addEventListener('click', saveReward);
+            
+            // 关闭Modal的事件绑定
+            document.querySelectorAll('.task-close-btn').forEach(btn => 
+                btn.onclick = () => document.getElementById('task-modal').classList.add('hidden')
+            );
+            document.querySelectorAll('.reward-close-btn').forEach(btn => 
+                btn.onclick = () => document.getElementById('reward-modal').classList.add('hidden')
+            );
+            
+            // 筛选事件
+            document.querySelectorAll('#task-filter button').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('#task-filter button').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.id.split('-')[1];
+                    displayTasks();
+                });
+            });
+        }
+
+        /** 任务管理 (家长) */
+        function openTaskModal(task = {}) {
+            document.getElementById('task-id').value = task.id || '';
+            document.getElementById('task-name').value = task.name || '';
+            document.getElementById('task-category').value = task.category || 'study';
+            document.getElementById('task-points').value = task.points || 10;
+            document.getElementById('task-modal').classList.remove('hidden');
+        }
+
+        function saveTask() {
+            const id = document.getElementById('task-id').value;
+            const name = document.getElementById('task-name').value.trim();
+            const category = document.getElementById('task-category').value;
+            const points = parseInt(document.getElementById('task-points').value);
+
+            if (!name || !points || points <= 0 || isNaN(points)) {
+                alert('请确保任务名称和积分有效！');
+                return;
+            }
+
+            if (id) {
+                // 编辑现有任务
+                const index = appData.tasks.findIndex(t => t.id == id);
+                if (index !== -1) {
+                    appData.tasks[index] = { id: parseInt(id), name, category, points };
+                }
+            } else {
+                // 创建新任务
+                const newId = Date.now();
+                appData.tasks.push({ id: newId, name, category, points });
+            }
+            
+            saveAppData('tasks');
+            document.getElementById('task-modal').classList.add('hidden');
+            displayTasks();
+        }
+
+        /** 奖励管理 (家长) */
+        function openRewardModal(reward = {}) {
+            document.getElementById('reward-id').value = reward.id || '';
+            document.getElementById('reward-name').value = reward.name || '';
+            document.getElementById('reward-cost').value = reward.cost || 30;
+            document.getElementById('reward-modal').classList.remove('hidden');
+        }
+
+        function saveReward() {
+            const id = document.getElementById('reward-id').value;
+            const name = document.getElementById('reward-name').value.trim();
+            const cost = parseInt(document.getElementById('reward-cost').value);
+
+            if (!name || !cost || cost <= 0 || isNaN(cost)) {
+                alert('请确保奖励名称和所需积分有效！');
+                return;
+            }
+
+            if (id) {
+                const index = appData.rewards.findIndex(r => r.id == id);
+                if (index !== -1) {
+                    appData.rewards[index] = { id: parseInt(id), name, cost };
+                }
+            } else {
+                const newId = Date.now();
+                appData.rewards.push({ id: newId, name, cost });
+            }
+            
+            saveAppData('rewards');
+            document.getElementById('reward-modal').classList.add('hidden');
+            displayRewards();
+        }
+
+        /** 显示任务列表 (所有用户) */
+        function displayTasks() {
+            const list = document.getElementById('task-list');
+            if (!list) return;
+            
+            let filteredTasks = appData.tasks;
+            if (currentFilter !== 'all') {
+                filteredTasks = appData.tasks.filter(t => t.category === currentFilter);
+            }
+            
+            list.innerHTML = filteredTasks.map(task => `
+                <div class="task-item" data-id="${task.id}">
+                    <div class="task-info">
+                        <span>${task.name} (${task.category === 'study' ? '学科' : '家务'})</span>
+                        <span>奖励: **${task.points}** 积分</span>
+                    </div>
+                    ${currentUser.identity === 'student' ? 
+                        `<button onclick="completeTask(${task.id}, ${task.points}, '${task.name}')"><i class="fas fa-check"></i> 打卡</button>` :
+                        `<div>
+                            <button onclick="openTaskModal(${JSON.stringify(task).replace(/"/g, '&quot;')})"><i class="fas fa-edit"></i> 编辑</button>
+                            <button class="danger" onclick="deleteItem('tasks', ${task.id})"><i class="fas fa-trash"></i> 删除</button>
+                        </div>`
+                    }
+                </div>
+            `).join('');
+        }
+
+        /** 显示奖励列表 (所有用户) */
+        function displayRewards() {
+            const list = document.getElementById('rewards-list');
+            if (!list) return;
+            
+            document.getElementById('current-points').textContent = appData.points;
+
+            list.innerHTML = appData.rewards.map(reward => `
+                <div class="reward-item" data-id="${reward.id}">
+                    <div class="task-info">
+                        <span>**${reward.name}**</span>
+                        <span>所需积分: **${reward.cost}**</span>
+                    </div>
+                    ${currentUser.identity === 'student' ? 
+                        `<button ${appData.points >= reward.cost ? '' : 'disabled'} onclick="exchangeReward(${reward.id}, ${reward.cost}, '${reward.name}')">兑换</button>` :
+                        `<div>
+                            <button onclick="openRewardModal(${JSON.stringify(reward).replace(/"/g, '&quot;')})"><i class="fas fa-edit"></i> 编辑</button>
+                            <button class="danger" onclick="deleteItem('rewards', ${reward.id})"><i class="fas fa-trash"></i> 删除</button>
+                        </div>`
+                    }
+                </div>
+            `).join('');
+        }
+
+        /** 学生打卡 */
+        function completeTask(id, points, name) {
+            if (confirm(`确认完成任务 "${name}"，奖励 ${points} 积分吗？`)) {
+                appData.points += points;
+                const record = {
+                    date: new Date().toISOString().split('T')[0],
+                    nickname: currentUser.nickname,
+                    taskName: name,
+                    points: points
+                };
+                appData.taskRecords.push(record);
+                
+                saveAppData('points');
+                saveAppData('taskRecords');
+                
+                document.getElementById('current-points').textContent = appData.points;
+                alert(`打卡成功！获得 ${points} 积分。`);
+                
+                displayBadges();
+                displayTaskRecords();
+                displayRewards(); // 刷新奖励列表，看是否可兑换
+            }
+        }
+
+        /** 学生兑换奖励 */
+        function exchangeReward(id, cost, name) {
+            if (appData.points < cost) {
+                alert('积分不足，请先完成更多任务！');
+                return;
+            }
+            if (confirm(`确定花费 ${cost} 积分兑换奖励 "${name}" 吗？兑换后积分将扣除，请与家长确认奖励领取事宜。`)) {
+                appData.points -= cost;
+                
+                saveAppData('points');
+                
+                document.getElementById('current-points').textContent = appData.points;
+                alert(`兑换成功！您的 ${name} 奖励信息已记录。`);
+
+                displayRewards();
+            }
+        }
+
+        /** 删除任务或奖励 */
+        function deleteItem(type, id) {
+            if (confirm(`确定删除此${type === 'tasks' ? '任务' : '奖励'}吗？`)) {
+                appData[type] = appData[type].filter(item => item.id !== id);
+                saveAppData(type);
+                if (type === 'tasks') displayTasks(); else displayRewards();
+            }
+        }
+
+        /** 成就徽章 */
+        function displayBadges() {
+            // 确保只有学生身份才计算自己的徽章
+            const records = appData.taskRecords.filter(r => r.nickname === currentUser.nickname);
+            const badgeContainer = document.getElementById('achievement-badges');
+            if (!badgeContainer) return;
+            
+            let badges = [];
+            
+            // 连续打卡天数
+            const today = new Date().toISOString().split('T')[0];
+            const uniqueDates = [...new Set(records.map(r => r.date))].sort();
+            let consecutiveDays = 0;
+            
+            // 查找最近的打卡记录
+            if (uniqueDates.length > 0) {
+                let lastDateStr = uniqueDates[uniqueDates.length - 1];
+                let checkDate = new Date(today);
+                let currentStreak = 0;
+                
+                // 检查今天是否打卡
+                if (lastDateStr === today) {
+                    currentStreak = 1;
+                    checkDate.setDate(checkDate.getDate() - 1); // 检查昨天
+                } else if (new Date(lastDateStr).toISOString().split('T')[0] === new Date(checkDate.setDate(checkDate.getDate() - 1)).toISOString().split('T')[0]) {
+                     // 如果今天没打卡，但昨天打了，从昨天开始计算连续
+                     currentStreak = 1;
+                } else {
+                    // 没有连续打卡
+                }
+                
+                let streakDate = lastDateStr === today ? new Date(today) : new Date(lastDateStr);
+
+                // 向后回溯连续天数
+                for (let i = uniqueDates.length - 1; i >= 0; i--) {
+                    const dateStr = uniqueDates[i];
+                    const date = new Date(dateStr);
+                    
+                    if (dateStr === streakDate.toISOString().split('T')[0]) {
+                        if(currentStreak === 0) currentStreak = 1; // 找到 streak 起点
+                        
+                        // 准备检查前一天
+                        streakDate.setDate(streakDate.getDate() - 1);
+                        const prevDateStr = streakDate.toISOString().split('T')[0];
+
+                        if (uniqueDates.includes(prevDateStr)) {
+                            currentStreak++;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+                consecutiveDays = currentStreak;
+            }
+
+
+            if (consecutiveDays >= 7) {
+                badges.push(`<span class="badge">🔥 连续打卡 ${consecutiveDays} 天!</span>`);
+            } else if (consecutiveDays > 0) {
+                 badges.push(`<span class="badge">🗓️ 持续努力中 (${consecutiveDays}天)</span>`);
+            }
+
+            // 学科/家务达人 (完成超过 10 个特定任务)
+            const studyCount = records.filter(r => appData.tasks.find(t => t.name === r.taskName && t.category === 'study')).length;
+            const choreCount = records.filter(r => appData.tasks.find(t => t.name === r.taskName && t.category === 'chore')).length;
+
+            if (studyCount >= 10) badges.push('<span class="badge">🧠 学霸小能手 (完成10个学习任务)!</span>');
+            if (choreCount >= 5) badges.push('<span class="badge">🧹 家务小帮手 (完成5个家务任务)!</span>');
+
+            badgeContainer.innerHTML = badges.join('');
+        }
+
+        /** 显示打卡记录 */
+        function displayTaskRecords() {
+            const container = document.getElementById('task-records-display');
+            if (!container) return;
+            
+            // 筛选出当前用户的记录
+            const records = appData.taskRecords.filter(r => r.nickname === currentUser.nickname);
+            
+            if (records.length === 0) {
+                container.innerHTML = '<p>暂无打卡记录。</p>';
+                return;
+            }
+            
+            // 按日期倒序显示
+            const html = records.sort((a, b) => new Date(b.date) - new Date(a.date)).map(r => `
+                <div class="card" style="border-left-color: #5bc0de;">
+                    **${r.date}**：完成任务 "**${r.taskName}**"，获得 **${r.points}** 积分。
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+        }
+
+        // --- V. 双向留言模块 (Message Logic) ---
+
+        let privateUnlocked = false;
+
+        function initMessageModule() {
+            // 绑定发布事件
+            document.getElementById('post-message-btn').addEventListener('click', postMessage);
+            document.getElementById('view-private-btn').addEventListener('click', unlockPrivateMessages);
+            
+            // 初始化显示
+            displayMessages();
+            privateUnlocked = false; // 每次加载模块时重置私密状态
+        }
+
+        /** 发布留言 */
+        function postMessage() {
+            const input = document.getElementById('message-input');
+            const type = document.getElementById('message-type').value;
+            const emoji = document.getElementById('message-emoji').value;
+            const content = input.value.trim();
+
+            if (!content) {
+                alert('留言内容不能为空！');
+                return;
+            }
+
+            if (type === 'reminder' && currentUser.identity === 'student') {
+                alert('您没有权限发布家长提醒！');
+                return;
+            }
+            if (type === 'feedback' && currentUser.identity === 'parent') {
+                alert('您没有权限发布孩子反馈！');
+                return;
+            }
+
+            const newMessage = {
+                id: Date.now(),
+                sender: currentUser.nickname,
+                identity: currentUser.identity,
+                type: type, // reminder, feedback, private
+                content: content,
+                timestamp: new Date().toLocaleString(),
+                emoji: emoji
+            };
+
+            appData.messages.push(newMessage);
+            saveAppData('messages');
+            input.value = ''; // 清空输入框
+            document.getElementById('message-emoji').value = ''; // 清空表情选择
+            
+            displayMessages();
+        }
+
+        /** 删除留言 */
+        function deleteMessage(id) {
+            if (confirm('确定删除这条留言吗？')) {
+                // 只能删除自己发布的留言
+                appData.messages = appData.messages.filter(msg => msg.id !== id || msg.sender !== currentUser.nickname);
+                saveAppData('messages');
+                displayMessages();
+            }
+        }
+
+        /** 解锁私密留言 */
+        function unlockPrivateMessages() {
+            if (privateUnlocked) return;
+            
+            // 如果设置了密码
+            if (currentUser.password) {
+                promptPasswordVerification(() => {
+                    privateUnlocked = true;
+                    displayMessages();
+                    alert('私密留言墙已解锁！');
+                }, () => {
+                    alert('密码验证失败，无法查看私密留言。');
+                });
+            } else {
+                // 未设置密码，直接解锁
+                privateUnlocked = true;
+                displayMessages();
+                alert('私密留言墙已解锁 (未设置本地密码)。');
+            }
+        }
+
+        /** 显示所有留言 */
+        function displayMessages() {
+            const reminderList = document.getElementById('reminder-list');
+            const feedbackList = document.getElementById('feedback-list');
+            const privateList = document.getElementById('private-list');
+            const viewPrivateBtn = document.getElementById('view-private-btn');
+
+            if (!reminderList) return; 
+
+            const reminders = appData.messages.filter(m => m.type === 'reminder');
+            const feedbacks = appData.messages.filter(m => m.type === 'feedback');
+            const privates = appData.messages.filter(m => m.type === 'private');
+
+            // 渲染普通留言
+            reminderList.innerHTML = renderMessageList(reminders);
+            feedbackList.innerHTML = renderMessageList(feedbacks);
+
+            // 渲染私密留言
+            if (privateUnlocked) {
+                viewPrivateBtn.classList.add('hidden');
+                privateList.innerHTML = renderMessageList(privates, true);
+            } else {
+                viewPrivateBtn.classList.remove('hidden');
+                privateList.innerHTML = '<p>请点击上方按钮验证身份以查看亲子私密留言。</p>';
+            }
+        }
+
+        /** 渲染单条留言列表 */
+        function renderMessageList(messages, isPrivate = false) {
+            if (messages.length === 0) return `<p>暂无${isPrivate ? '私密' : ''}留言。</p>`;
+            
+            // 留言按时间倒序排列
+            const sortedMessages = messages.sort((a, b) => b.id - a.id);
+            
+            return sortedMessages.map(msg => `
+                <div class="message-item ${msg.type}">
+                    <div class="message-meta">
+                        <span>${msg.emoji} **${msg.sender}** (${msg.identity === 'parent' ? '家长' : '学生'})</span>
+                        <span>${msg.timestamp}</span>
+                    </div>
+                    <div class="message-content">${msg.content}</div>
+                    ${msg.sender === currentUser.nickname ? 
+                        `<button class="message-delete-btn" onclick="deleteMessage(${msg.id})">
+                            <i class="fas fa-times-circle"></i>
+                        </button>` : ''}
+                </div>
+            `).join('');
+        }
+
+
+        // --- VI. 积分排行榜模块 (Leaderboard Logic) ---
+
+        /** 显示排行榜 */
+        function displayLeaderboard() {
+            const container = document.getElementById('leaderboard-display');
+            if (!container) return;
+            
+            // 1. 聚合数据: 计算每个用户的总积分
+            const monthlyPoints = {}; // { nickname: totalPoints }
+            const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+            
+            appData.taskRecords.forEach(record => {
+                if (record.date.startsWith(currentMonth)) {
+                    const nickname = record.nickname;
+                    monthlyPoints[nickname] = (monthlyPoints[nickname] || 0) + record.points;
+                }
+            });
+            
+            // 2. 转换为数组并排序
+            const leaderboard = Object.entries(monthlyPoints)
+                .map(([nickname, points]) => ({ nickname, points }))
+                .sort((a, b) => b.points - a.points); // 积分高的在前
+                
+            if (leaderboard.length === 0) {
+                container.innerHTML = '<p>本月暂无打卡记录，没有排行榜数据。</p>';
+                return;
+            }
+            
+            // 3. 渲染HTML
+            let html = `
+                <table style="width:100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background-color: #f1f1f1;">
+                            <th style="padding: 10px; border: 1px solid #ddd;">排名</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">昵称</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">月度积分</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            leaderboard.forEach((item, index) => {
+                const rank = index + 1;
+                const icon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `No.${rank}`;
+                
+                html += `
+                    <tr style="background-color: ${item.nickname === currentUser.nickname ? '#e0f7fa' : 'white'};">
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${icon}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">**${item.nickname}** ${item.nickname === currentUser.nickname ? '(我)' : ''}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: right; color: #e67e22;">**${item.points}**</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
